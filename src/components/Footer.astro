@@ -1,0 +1,26 @@
+---
+const year = new Date().getFullYear();
+
+const links = [
+  { href: 'https://github.com/turtleand', label: 'GitHub' },
+  { href: 'https://turtleand.com', label: 'turtleand.com' },
+];
+---
+
+<footer class="mt-auto" style="background: var(--footer-bg);">
+  <div class="container py-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted">
+      <p>&copy; {year} Turtleand Hermes</p>
+      <div class="flex items-center gap-3">
+        {links.map(({ href, label }) => (
+          <a
+            href={href}
+            class="px-3 py-1.5 rounded-pill border border-border hover:border-border-strong hover:text-ink no-underline transition-all"
+          >
+            {label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</footer>
