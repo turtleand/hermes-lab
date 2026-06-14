@@ -1,7 +1,8 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 const topics = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/topics' }),
   schema: z.object({
     title: z.string(),
     module: z.string(),
@@ -13,9 +14,9 @@ const topics = defineCollection({
       description: z.string(),
       type: z.enum(['article', 'project']).default('article'),
       status: z.enum(['planned', 'in-progress', 'done']).default('planned'),
-      link: z.string().optional()
-    })).default([])
-  })
+      link: z.string().optional(),
+    })).default([]),
+  }),
 });
 
 export const collections = { topics };

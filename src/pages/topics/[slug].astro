@@ -1,17 +1,17 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const topics = await getCollection('topics');
   return topics.map((topic) => ({
-    params: { slug: topic.slug },
+    params: { slug: topic.id },
     props: { topic },
   }));
 }
 
 const { topic } = Astro.props;
-const { Content } = await topic.render();
+const { Content } = await render(topic);
 
 function getStatusBadge(status: string) {
   switch (status) {
@@ -31,7 +31,7 @@ const status = getStatusBadge(topic.data.status);
     "headline": topic.data.title,
     "description": topic.data.summary,
     "author": { "@type": "Person", "name": "Turtleand", "url": "https://turtleand.com" },
-    "url": `https://hermes.turtleand.com/topics/${topic.slug}`
+    "url": `https://hermes.turtleand.com/topics/${topic.id}`
   })} />
   <article class="py-12">
     <div class="container">
