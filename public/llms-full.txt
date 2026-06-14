@@ -1,0 +1,96 @@
+# Turtleand Hermes Lab — Full Content
+
+---
+
+# Fix Telegram Voice Speed Control in Hermes with OGG Opus
+
+## The problem
+
+Hermes can reply with text-to-speech audio on Telegram. The audio may play correctly, but if it arrives as a regular MP3 attachment, Telegram does not show the normal voice-message controls.
+
+That means no waveform. No compact voice bubble. No 1.5x or 2x speed control. For short replies this is only annoying. For long briefings, reports, or reflective audio responses, it becomes a real usability problem.
+
+The cause is format, not the voice model.
+
+Telegram treats true bot voice messages as OGG files encoded with the Opus codec. If Hermes produces MP3 and sends it as audio, Telegram can still play it, but it behaves like a file attachment rather than a voice note.
+
+## The fix
+
+Convert the generated TTS file to OGG Opus before Telegram delivery.
+
+```bash
+ffmpeg -i input.mp3 -c:a libopus -b:a 48k -vbr on \
+  -compression_level 10 -frame_duration 60 \
+  -application voip output.ogg
+```
+
+Send the `.ogg` file through Telegram's voice-message path. Telegram should then show the waveform and playback speed controls.
+
+## Why this matters for Hermes
+
+Hermes is designed to work across platforms. Telegram is only one surface, but it has platform-specific expectations. A generic audio file is not always the same thing as a native voice message.
+
+For Hermes users, the practical distinction is simple:
+
+- MP3 attachment: playable, but slower to consume and less native to Telegram.
+- OGG Opus voice note: compact voice bubble, waveform, 1.5x and 2x playback.
+
+When Hermes is used as a voice-first assistant, this detail changes the feel of the whole system.
+
+## Cold-start behavior
+
+A fresh Hermes install can still produce MP3 replies if the default TTS provider outputs MP3 and `ffmpeg` is missing.
+
+That is expected behavior, but the user experience is not ideal. Hermes should make the dependency visible during setup or diagnostics.
+
+A good cold-start check would say:
+
+```text
+Telegram voice bubbles require ffmpeg for MP3/WAV TTS providers.
+Without ffmpeg, Hermes will send regular audio attachments instead.
+```
+
+On Ubuntu or Debian, install it with:
+
+```bash
+sudo apt install ffmpeg
+```
+
+On macOS:
+
+```bash
+brew install ffmpeg
+```
+
+## How to verify the result
+
+After conversion, check the file type:
+
+```bash
+ffprobe output.ogg
+```
+
+You want to see an OGG container and an Opus audio stream.
+
+Then send the file through the Telegram voice path. In Telegram, the result should appear as a voice bubble with speed controls.
+
+## What Hermes could improve upstream
+
+This should be handled as a product-quality issue, not only a local workaround.
+
+Possible improvements:
+
+1. `hermes doctor` warns when Telegram voice mode is enabled but `ffmpeg` is missing.
+2. The setup wizard explains that Telegram voice bubbles require OGG Opus.
+3. The TTS pipeline logs a clear warning when it falls back to MP3 attachments.
+4. Documentation links the symptom, missing speed controls, to the actual cause, wrong audio format.
+
+The durable lesson is broader than Telegram: platform-native delivery often depends on boring format details. Assistants feel intelligent only when those details are handled quietly.
+
+## Sources
+
+- [Telegram Bot API: sendVoice](https://core.telegram.org/bots/api#sendvoice)
+- [Opus codec](https://opus-codec.org/)
+- [ffmpeg Opus encoding](https://trac.ffmpeg.org/wiki/Encode/HighQualityAudio)
+- [Hermes Agent TTS docs](https://hermes-agent.nousresearch.com/docs/user-guide/features/tts/)
+

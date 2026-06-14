@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light theme (default) */
+:root {
+  --bg: #f7f5ff;
+  --bg-spot-1: rgba(95, 93, 240, 0.08);
+  --bg-spot-2: rgba(31, 162, 255, 0.12);
+  --panel: #ffffff;
+  --panel-soft: #fdfdff;
+  --ink: #1f2131;
+  --muted: #4f5160;
+  --accent: #5f5df0;
+  --accent-2: #1fa2ff;
+  --border: #e4e6ef;
+  --border-strong: #d1d5e5;
+  --glow: 0 20px 60px rgba(95, 93, 240, 0.15);
+
+  /* Header */
+  --header-bg: rgba(255, 255, 255, 0.75);
+  --header-border: rgba(228, 230, 239, 0.6);
+
+  /* Hero */
+  --hero-gradient: linear-gradient(135deg, var(--bg-spot-1) 0%, transparent 50%),
+                   linear-gradient(225deg, var(--bg-spot-2) 0%, transparent 50%);
+
+  /* Footer */
+  --footer-bg: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+}
+
+/* Dark theme */
+.dark {
+  --bg: #0e1e2b;
+  --bg-spot-1: rgba(111, 225, 195, 0.1);
+  --bg-spot-2: rgba(31, 111, 235, 0.16);
+  --panel: #0f1b2a;
+  --panel-soft: #0b1623;
+  --ink: #e8edf6;
+  --muted: #a7b8c7;
+  --accent: #6fe1c3;
+  --accent-2: #2e8373;
+  --border: #1d2f45;
+  --border-strong: #21415c;
+  --glow: 0 20px 60px rgba(6, 16, 28, 0.6);
+
+  /* Header */
+  --header-bg: rgba(14, 30, 43, 0.85);
+  --header-border: rgba(29, 47, 69, 0.6);
+
+  /* Hero */
+  --hero-gradient: linear-gradient(135deg, var(--bg-spot-1) 0%, transparent 50%),
+                   linear-gradient(225deg, var(--bg-spot-2) 0%, transparent 50%);
+
+  /* Footer */
+  --footer-bg: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+}
+
+@layer base {
+  html {
+    @apply bg-bg text-ink;
+    font-family: 'Inter var', 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply min-h-screen antialiased;
+    background: var(--bg);
+    background-image: var(--hero-gradient);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-ink;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+
+  a {
+    @apply text-accent hover:text-accent-2 transition-colors;
+  }
+
+  code {
+    @apply font-mono text-sm bg-panel-soft border border-border px-1.5 py-0.5 rounded;
+  }
+
+  pre {
+    @apply bg-panel border border-border rounded-lg p-4 overflow-x-auto;
+  }
+
+  pre code {
+    @apply bg-transparent border-0 p-0;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .prose {
+    @apply text-ink leading-relaxed;
+  }
+
+  .prose h1, .prose h2, .prose h3 {
+    @apply mt-8 mb-4;
+  }
+
+  .prose p {
+    @apply mb-4;
+  }
+
+  .prose ul, .prose ol {
+    @apply mb-4 pl-6;
+  }
+
+  .prose li {
+    @apply mb-2;
+  }
+
+  .prose ul li {
+    @apply list-disc;
+  }
+
+  .prose ol li {
+    @apply list-decimal;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-accent pl-4 italic text-muted;
+  }
+
+  .prose table {
+    @apply w-full mb-4 border-collapse;
+  }
+
+  .prose th, .prose td {
+    @apply border border-border px-3 py-2 text-left;
+  }
+
+  .prose th {
+    @apply bg-panel-soft font-semibold;
+  }
+
+  .prose hr {
+    @apply border-border my-8;
+  }
+
+  /* Pill button style */
+  .pill {
+    @apply px-4 py-1.5 rounded-pill text-sm font-medium transition-all;
+  }
+
+  .pill-primary {
+    @apply bg-accent text-panel hover:shadow-glow;
+  }
+
+  .pill-secondary {
+    @apply bg-panel border border-border text-ink hover:border-border-strong;
+  }
+
+  /* Card style */
+  .card {
+    @apply bg-panel border border-border rounded-xl p-6 shadow-glow;
+  }
+
+  /* Module badge */
+  .module-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill text-xs font-medium bg-panel-soft border border-border text-muted;
+  }
+
+  /* Status indicators */
+  .status-done {
+    @apply text-accent;
+  }
+
+  .status-in-progress {
+    @apply text-accent-2;
+  }
+
+  .status-planned {
+    @apply text-muted;
+  }
+}
