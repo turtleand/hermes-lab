@@ -47,22 +47,18 @@ Use the Telegram account that owns the bot:
 
 This is the easy step to miss. The setting is controlled through BotFather, not the normal bot DM settings.
 
-Then return to the Hermes bot DM and send:
+Then create the lanes manually in Telegram:
 
-```text
-/topic
-```
+1. Open the Hermes bot DM.
+2. Tap the bot name at the top to open chat info.
+3. Enable **Topics** if the chat is not already in topic mode.
+4. Open the bot DM's topic list or **All Messages** view.
+5. Use Telegram's create-topic action to add the lanes you want, such as **General**, **News**, and **Build**.
+6. Send the first message inside each topic so Telegram creates the thread and Hermes can bind that thread to its own session.
 
-Useful commands:
+Do not stop in the root DM after enabling topics. The root can behave like a lobby, especially when `ignore_root_dm: true` is set. The working lanes are the topics themselves.
 
-```text
-/topic
-/topic help
-/topic off
-/new
-```
-
-`/new` resets only the current topic session when used inside a topic.
+If you need a clean slate inside one lane later, `/new` resets only that topic's Hermes session. It does not create the topic.
 
 ## Choosing topics
 
@@ -80,7 +76,7 @@ The topic names matter less than the boundary they create.
 
 ## Optional stable config
 
-Hermes can keep stable DM topics in config:
+Manually created lanes do not need user-driven topic commands. If you want stable operator-managed topics in config, store the existing topic thread IDs privately:
 
 ```yaml
 platforms:
@@ -91,15 +87,20 @@ platforms:
         - chat_id: <telegram_user_id>
           topics:
             - name: General
+              thread_id: <general_thread_id>
             - name: News
+              thread_id: <news_thread_id>
             - name: Build
+              thread_id: <build_thread_id>
             - name: Research
+              thread_id: <research_thread_id>
             - name: Ops
+              thread_id: <ops_thread_id>
 ```
 
 `ignore_root_dm: true` helps keep the root DM from becoming the everything-chat.
 
-Use placeholders in public examples. Do not publish real chat IDs, thread IDs, bot tokens, local paths, or delivery targets.
+For public examples, use placeholders. Do not publish real chat IDs, thread IDs, bot tokens, local paths, or delivery targets. In private config, thread IDs are what prevent an already-created lane from being confused with a new topic Hermes should create.
 
 ## When to use DM topics
 
@@ -109,7 +110,7 @@ Use group topics when other people need to see or join the conversations.
 
 ## Bottom line
 
-Telegram DM topics make one Hermes bot easier to use. Enable threaded mode in BotFather, run `/topic`, create a few useful lanes, and send scheduled output to the topic where it belongs.
+Telegram DM topics make one Hermes bot easier to use. Enable threaded mode in BotFather, create the topic lanes manually in the bot DM, and send scheduled output to the topic where it belongs.
 
 The core benefit is simple: cleaner context, less noise, and one assistant that stays organized.
 
