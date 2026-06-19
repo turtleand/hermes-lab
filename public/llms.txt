@@ -3,10 +3,11 @@
 > Practical Hermes Agent field notes for voice workflows, messaging gateways, tools, skills, and operational reliability.
 
 ## Guides
+- [Use Telegram DM Topics to Split One Hermes Bot into Multiple Workspaces](https://hermes.turtleand.com/topics/telegram-dm-topics-single-bot): How to turn one Hermes Telegram bot DM into multiple topic-based sessions using BotFather Threaded Mode, the /topic command, and optional stable dm_topics configuration.
 - [Fix Telegram Voice Speed Control in Hermes with OGG Opus](https://hermes.turtleand.com/topics/telegram-ogg-voice-speed-control): Why Hermes Telegram TTS replies need OGG Opus voice files for waveform and playback speed controls, and how ffmpeg fixes MP3 fallback.
 
 ## About
-Created by Turtleand — documenting real-world Hermes deployment and configuration.
+Created by Turtleand, documenting real-world Hermes deployment and configuration.
 - Portal: https://turtleand.com
 - Hermes Agent docs: https://hermes-agent.nousresearch.com/docs
 - GitHub: https://github.com/turtleand
