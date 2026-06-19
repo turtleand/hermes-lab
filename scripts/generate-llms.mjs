@@ -33,7 +33,9 @@ async function main() {
     const content = await readFile(join(TOPICS_DIR, file), 'utf-8');
     const { data, body } = parseFrontmatter(content);
     const slug = file.replace(/\.mdx$/, '');
-    topics.push({ slug, ...data, body });
+    if (data.draft !== 'true') {
+      topics.push({ slug, ...data, body });
+    }
   }
 
   // Generate llms.txt

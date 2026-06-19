@@ -2,94 +2,56 @@
 
 ---
 
-# Use Telegram DM Topics to Split One Hermes Bot into Multiple Workspaces
+# Use Telegram DM Topics to Organize One Hermes Bot
 
-A single Telegram chat can become noisy fast.
+One long bot chat gets noisy fast.
 
-News briefings, repository work, strategy notes, voice explanations, cron output, and troubleshooting all land in the same stream. The agent still works, but the human experience gets worse. You lose the clean boundary between modes of thinking.
+Research, builds, news, scheduled output, and troubleshooting can all end up in the same stream. Hermes still works, but the user has to keep switching context inside one crowded conversation.
 
-The better pattern is not always a second bot or a second Hermes profile. For one-person use, the lighter fix is usually Telegram DM topics.
+Telegram DM topics give one Hermes bot multiple focused lanes.
 
-With DM topics, one Hermes bot can behave like several focused workspaces inside the same Telegram conversation. Each topic maps to its own Hermes session. The bot identity, long-term memory, tools, and profile stay shared, but the live conversation context stays separated.
+## What users get
 
-This is the setup pattern we used for Turtleand.
+- One assistant, not many bots.
+- Separate sessions for different kinds of work.
+- Cleaner prompts because each topic keeps its own live context.
+- A better place for scheduled outputs to land.
+- Less noise in the main chat.
 
-## The core idea
-
-Telegram supports threaded conversations for bot DMs when the bot has topics enabled. Hermes exposes that through `/topic`.
-
-The result looks like this:
+Think of it as one assistant with rooms:
 
 ```text
 Hermes bot DM
-├── System
 ├── General
 ├── News
-├── Turtleand Ecosystem
 ├── Build
 ├── Research
-└── Hermes Ops
+└── Ops
 ```
 
-Each topic is still inside the same Telegram bot chat, but Hermes treats each one as a separate session.
+Each topic stays inside the same Telegram bot DM, but Hermes treats it as a separate session. The bot, tools, memory, and profile can stay shared. The active conversation context stays scoped to the topic.
 
-That gives you three useful layers:
+## Setup
 
-1. One Hermes profile for the overall assistant.
-2. One Telegram bot DM as the operating surface.
-3. Multiple Telegram topics as separate conversation lanes.
+First, enable threaded mode for the bot in BotFather.
 
-This is different from making many bots. You are not multiplying credentials, profiles, cron folders, memory stores, or gateway services. You are separating working context inside one assistant.
-
-## The part that was easy to miss
-
-The setting was not in the normal Telegram chat settings.
-
-It was in BotFather.
-
-More specifically, in our Telegram client the path went through the BotFather Mini App. That detail matters because the old text-command menu did not make the setting obvious.
-
-The mistake to avoid:
-
-```text
-Wrong mental model: enable my bot as a Mini App.
-Right mental model: use BotFather's Mini App settings interface to enable threads for the bot.
-```
-
-You are not turning Hermes itself into a Telegram Mini App. You are opening BotFather's management interface and enabling the bot capability that allows threaded private conversations.
-
-## Step 1: Open BotFather's settings interface
-
-Use the Telegram account that owns the bot.
+Use the Telegram account that owns the bot:
 
 1. Open `@BotFather`.
-2. Tap the **Open** button to launch BotFather's Mini App.
+2. Open BotFather's management interface.
 3. Select the Hermes bot.
 4. Open **Bot Settings**.
 5. Find **Threads Settings** or **Threaded Mode**.
-6. Turn on **Threaded Mode**.
-7. Keep user-created topics enabled.
+6. Enable **Threaded Mode**.
+7. Allow users to create topics.
 
-Hermes needs two Telegram-side flags to be true:
+This is the easy step to miss. The setting is controlled through BotFather, not the normal bot DM settings.
 
-- `has_topics_enabled`
-- `allows_users_to_create_topics`
-
-If either one is disabled, Hermes should not activate topic mode. The official Hermes docs describe this prerequisite as BotFather → Bot Settings → Threads Settings.
-
-The UI name can vary across Telegram clients. The important part is the same: enable threaded mode for the bot through BotFather, not through a normal DM settings screen.
-
-## Step 2: Run `/topic` in the root DM
-
-After BotFather is configured, return to the private chat with the Hermes bot and send:
+Then return to the Hermes bot DM and send:
 
 ```text
 /topic
 ```
-
-Hermes checks the bot flags with Telegram. If the prerequisites are met, Hermes enables multi-session DM mode.
-
-From that point, the root DM becomes more like a lobby or system area. Actual work should happen inside topics.
 
 Useful commands:
 
@@ -100,51 +62,25 @@ Useful commands:
 /new
 ```
 
-`/topic` enables topic mode or shows status. `/topic help` explains usage. `/topic off` disables it from the root DM. `/new` resets only the current topic session when used inside a topic.
+`/new` resets only the current topic session when used inside a topic.
 
-## Step 3: Create topics around real workstreams
+## Choosing topics
 
-Do not create too many topics at first. Start with the modes you actually switch between.
+Start small. Use topic names that match real work modes.
 
-A practical personal setup:
+A practical default:
 
-```text
-General
-News
-Turtleand Ecosystem
-Build
-Research
-Hermes Ops
-```
+- **General:** quick questions and miscellaneous work.
+- **News:** current events and scheduled briefings.
+- **Build:** implementation, repository work, and verification.
+- **Research:** papers, references, and synthesis.
+- **Ops:** Hermes setup, models, cron jobs, gateway behavior, and troubleshooting.
 
-What each lane is for:
+The topic names matter less than the boundary they create.
 
-- **General:** quick questions and miscellaneous continuity.
-- **News:** date-bounded briefings, current events, and scheduled digests.
-- **Turtleand Ecosystem:** strategy, surface planning, positioning, and artifact decisions.
-- **Build:** repository work, implementation, PRs, and technical verification.
-- **Research:** papers, technical references, product investigation, and synthesis.
-- **Hermes Ops:** gateway behavior, model routing, skills, cron, Telegram setup, and troubleshooting.
+## Optional stable config
 
-The value is not the topic names themselves. The value is that each name creates a mental boundary. You stop asking one giant chat to hold every mode of work.
-
-## What Hermes does with each topic
-
-Hermes treats each topic as a separate session.
-
-That means the News topic does not inherit the live conversation history from Build. Hermes Ops does not carry the entire research thread. The agent can still use persistent memory and skills, but the active session context is scoped to the topic.
-
-That matters for both quality and cost.
-
-A single mega-chat accumulates unrelated context. The model has to carry old assumptions, stale plans, and mixed goals. Topic sessions keep the prompt smaller and the intention clearer.
-
-The trade-off is that you now have more sessions. That is usually worth it because each session is cleaner.
-
-## Stable topics with config
-
-Hermes also supports operator-declared stable DM topics through config. This is useful when you want the same named topics to exist predictably after gateway restarts.
-
-The pattern looks like this:
+Hermes can keep stable DM topics in config:
 
 ```yaml
 platforms:
@@ -156,77 +92,26 @@ platforms:
           topics:
             - name: General
             - name: News
-            - name: Turtleand Ecosystem
             - name: Build
             - name: Research
-            - name: Hermes Ops
+            - name: Ops
 ```
 
-`ignore_root_dm: true` keeps the root DM from becoming the accidental everything-chat. It nudges work into the topic lanes.
+`ignore_root_dm: true` helps keep the root DM from becoming the everything-chat.
 
-Hermes can create missing configured topics at gateway startup and remember the thread IDs in config. Do not publish real chat IDs or thread IDs in public examples. Use placeholders.
+Use placeholders in public examples. Do not publish real chat IDs, thread IDs, bot tokens, local paths, or delivery targets.
 
-## Where cron jobs should land
+## When to use DM topics
 
-Once topics exist, scheduled work should land in the right topic.
+Use DM topics when one person mainly uses the bot and wants separate private sessions without extra bots.
 
-A morning news digest belongs in News. Gateway troubleshooting belongs in Hermes Ops. Build review packets belong in Build.
-
-The durable rule is simple:
-
-```text
-Deliver scheduled output to the topic where the human will review it.
-```
-
-If a cron job delivers to the root DM while topic mode is active, it can land in the lobby or the wrong place. Use the topic-specific delivery target when the job is meant for a workstream.
-
-This is less about technical neatness and more about preserving attention. Automation is useful only when the output appears where the next decision actually happens.
-
-## DM topics vs group topics
-
-There are two Telegram topic patterns:
-
-1. Private DM topics with the Hermes bot.
-2. Forum topics inside a Telegram group or supergroup.
-
-For a personal assistant, start with DM topics.
-
-Use DM topics when:
-
-- You are the main user.
-- You want one clean Hermes chat.
-- You do not need team visibility.
-- You want separate sessions without separate bots.
-
-Use group topics when:
-
-- Other humans need to see or join the conversations.
-- The bot should operate in a team workspace.
-- You want visible shared rooms for PRs, news, or operations.
-
-The setup we wanted was personal first. That made DM topics the right default.
-
-## Gotchas
-
-**The setting may be hidden in the Mini App.** If you cannot find Threaded Mode in BotFather's text menu, open BotFather's Mini App and look under the bot's settings.
-
-**Do not confuse BotFather's Mini App with your bot being a Mini App.** You are only using BotFather's interface.
-
-**Root chat is not the workspace anymore.** Once topic mode is active, use topics for real work and treat the root as a lobby.
-
-**Topic names can be renamed.** Hermes may auto-rename ad hoc topics based on session titles unless configured otherwise. Operator-declared `dm_topics` are meant to preserve stable names.
-
-**Private details should stay private.** Public guides should show placeholders for chat IDs, thread IDs, bot credentials, local paths, and delivery targets.
+Use group topics when other people need to see or join the conversations.
 
 ## Bottom line
 
-Telegram DM topics let one Hermes bot feel like a small operating system instead of one endless chat.
+Telegram DM topics make one Hermes bot easier to use. Enable threaded mode in BotFather, run `/topic`, create a few useful lanes, and send scheduled output to the topic where it belongs.
 
-The setup depends on one non-obvious step: open BotFather's Mini App, find the bot's Threads Settings, and enable Threaded Mode with user-created topics allowed. Then return to Hermes and run `/topic`.
-
-After that, the real design work is human: choose topic names that match how you think, route scheduled outputs to the right lane, and keep the root chat clean.
-
-The point is not to add structure for its own sake. The point is to protect attention while keeping one capable assistant at the center.
+The core benefit is simple: cleaner context, less noise, and one assistant that stays organized.
 
 ## Sources
 

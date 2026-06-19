@@ -9,6 +9,7 @@ const topics = defineCollection({
     subtopic: z.string(),
     summary: z.string(),
     status: z.enum(['planned', 'in-progress', 'done']).default('planned'),
+    draft: z.boolean().default(false),
     articles: z.array(z.object({
       title: z.string(),
       description: z.string(),

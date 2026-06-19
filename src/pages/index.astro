@@ -2,7 +2,7 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const topics = await getCollection('topics');
+const topics = await getCollection('topics', ({ data }) => !data.draft);
 
 // Group topics by module
 const modules = [
