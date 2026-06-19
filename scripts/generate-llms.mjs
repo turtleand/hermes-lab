@@ -33,7 +33,9 @@ async function main() {
     const content = await readFile(join(TOPICS_DIR, file), 'utf-8');
     const { data, body } = parseFrontmatter(content);
     const slug = file.replace(/\.mdx$/, '');
-    topics.push({ slug, ...data, body });
+    if (data.draft !== 'true') {
+      topics.push({ slug, ...data, body });
+    }
   }
 
   // Generate llms.txt
@@ -50,7 +52,7 @@ async function main() {
 
   llms += `
 ## About
-Created by Turtleand — documenting real-world Hermes deployment and configuration.
+Created by Turtleand, documenting real-world Hermes deployment and configuration.
 - Portal: https://turtleand.com
 - Hermes Agent docs: https://hermes-agent.nousresearch.com/docs
 - GitHub: https://github.com/turtleand
@@ -60,7 +62,7 @@ Created by Turtleand — documenting real-world Hermes deployment and configurat
   console.log('Generated public/llms.txt');
 
   // Generate llms-full.txt
-  let full = `# Turtleand Hermes Lab — Full Content\n\n`;
+  let full = `# Turtleand Hermes Lab - Full Content\n\n`;
   for (const t of topics) {
     full += `---\n\n# ${t.title}\n\n${stripMdx(t.body)}\n\n`;
   }
