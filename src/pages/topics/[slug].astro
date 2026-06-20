@@ -15,9 +15,9 @@ const { Content } = await render(topic);
 
 function getStatusBadge(status: string) {
   switch (status) {
-    case 'done': return { label: 'Complete', class: 'bg-accent/10 text-accent border-accent/20' };
-    case 'in-progress': return { label: 'In Progress', class: 'bg-accent-2/10 text-accent-2 border-accent-2/20' };
-    default: return { label: 'Planned', class: 'bg-muted/10 text-muted border-muted/20' };
+    case 'done': return { label: 'Verified note', class: 'status-badge status-badge--done' };
+    case 'in-progress': return { label: 'In progress', class: 'status-badge status-badge--progress' };
+    default: return { label: 'Planned', class: 'status-badge status-badge--planned' };
   }
 }
 
@@ -33,32 +33,47 @@ const status = getStatusBadge(topic.data.status);
     "author": { "@type": "Person", "name": "Turtleand", "url": "https://turtleand.com" },
     "url": `https://hermes.turtleand.com/topics/${topic.id}`
   })} />
-  <article class="py-12">
-    <div class="container">
-      <!-- Back link -->
-      <a href="/" class="inline-flex items-center gap-2 text-sm text-muted hover:text-ink no-underline mb-8 transition-colors">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+  <article class="article-shell">
+    <div class="container article-container">
+      <a href="/#field-notes" class="back-link no-underline">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Back to topics
+        Back to field notes
       </a>
 
-      <!-- Header card -->
-      <div class="card mb-8">
-        <div class="flex flex-wrap items-center gap-3 mb-4">
+      <header class="article-hero">
+        <div class="article-hero__meta">
           <span class="module-badge">{topic.data.module}</span>
-          <span class={`px-2.5 py-1 rounded-pill text-xs font-medium border ${status.class}`}>
-            {status.label}
-          </span>
+          <span class={status.class}>{status.label}</span>
         </div>
-        <h1 class="text-3xl md:text-4xl font-bold mb-3">{topic.data.title}</h1>
-        <p class="text-lg text-muted">{topic.data.summary}</p>
-      </div>
+        <h1>{topic.data.title}</h1>
+        <p>{topic.data.summary}</p>
+      </header>
 
-      <!-- Content -->
-      <div class="card">
-        <div class="prose max-w-none">
-          <Content />
+      <div class="article-layout">
+        <aside class="article-rail" aria-label="Article context">
+          <p class="eyebrow">Field note</p>
+          <dl>
+            <div>
+              <dt>Surface</dt>
+              <dd>Hermes Lab</dd>
+            </div>
+            <div>
+              <dt>Mode</dt>
+              <dd>Operational note</dd>
+            </div>
+            <div>
+              <dt>Safety rule</dt>
+              <dd>Pattern shared, private details removed.</dd>
+            </div>
+          </dl>
+        </aside>
+
+        <div class="article-card">
+          <div class="prose max-w-none">
+            <Content />
+          </div>
         </div>
       </div>
     </div>
