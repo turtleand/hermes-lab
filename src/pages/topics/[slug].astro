@@ -24,7 +24,7 @@ function getStatusBadge(status: string) {
 const status = getStatusBadge(topic.data.status);
 ---
 
-<BaseLayout title={topic.data.title} description={topic.data.summary}>
+<BaseLayout title={topic.data.title} description={topic.data.summary} ogType="article">
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "TechArticle",
