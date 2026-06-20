@@ -3,6 +3,7 @@
 > Practical Hermes Agent field notes for voice workflows, messaging gateways, tools, skills, and operational reliability.
 
 ## Guides
+- [Safe Hermes Updates on EC2](https://hermes.turtleand.com/topics/safe-hermes-updates-on-ec2): A cautious SSH-first routine for updating Hermes on an EC2 server, checking gateway health, and adding a quiet nightly update-available alert.
 - [Use Telegram DM Topics to Organize One Hermes Bot](https://hermes.turtleand.com/topics/telegram-dm-topics-single-bot): Use Telegram DM topics to turn one Hermes bot chat into focused workspaces without adding more bots or profiles.
 - [Fix Telegram Voice Speed Control in Hermes with OGG Opus](https://hermes.turtleand.com/topics/telegram-ogg-voice-speed-control): Why Hermes Telegram TTS replies need OGG Opus voice files for waveform and playback speed controls, and how ffmpeg fixes MP3 fallback.
 

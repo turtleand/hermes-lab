@@ -2,6 +2,137 @@
 
 ---
 
+# Safe Hermes Updates on EC2
+
+Hermes can update itself with one command, but a server running the Telegram gateway deserves a slower routine.
+
+The rule is simple: check first, update from SSH, then verify the gateway from outside the chat session that depends on it.
+
+## Before updating
+
+SSH into the EC2 box and check the installed version plus the local git state:
+
+```bash
+hermes --version
+git -C ~/.hermes/hermes-agent status --short
+```
+
+If the git status is clean, continue.
+
+If there are local changes, stop and decide what they are. Commit them, intentionally stash them, or back them up before updating. Do not let an update hide work you still need to understand.
+
+## Safe update routine
+
+Run this from SSH into the EC2 server:
+
+```bash
+hermes update
+hermes --version
+hermes doctor
+hermes gateway status
+```
+
+This checks four things:
+
+1. Hermes updated successfully.
+2. The version changed or is already current.
+3. `hermes doctor` still sees a healthy setup.
+4. The gateway service is still reachable.
+
+## If the gateway service definition is outdated
+
+Sometimes the code updates cleanly, but the installed gateway service definition is still old. If `hermes gateway status` says the service definition is outdated, restart the system service from SSH, not from inside Telegram:
+
+```bash
+sudo hermes gateway restart --system
+hermes gateway status --system
+journalctl -u hermes-gateway.service --since '10 minutes ago' --no-pager
+```
+
+This matters because a Telegram-served Hermes session depends on the gateway it is trying to restart. SSH gives you an outside control plane, so you can recover even if the gateway briefly disconnects.
+
+## Ongoing manual check
+
+For a quick manual check, run:
+
+```bash
+hermes --version
+```
+
+When you want to know whether an update is available without installing it, run:
+
+```bash
+hermes update --check
+```
+
+That command checks for an update but does not apply it.
+
+## Optional nightly update alert
+
+A good server routine should not auto-update Hermes while you sleep. It should alert only when the update check returns something other than the normal already-current result, so you can review it and run the safe SSH routine yourself.
+
+Create a quiet watchdog script:
+
+```bash
+mkdir -p ~/.hermes/scripts
+cat > ~/.hermes/scripts/check-hermes-update.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+output="$(hermes update --check 2>&1 || true)"
+
+if grep -qi "already up to date" <<<"$output"; then
+  exit 0
+fi
+
+current="$(hermes --version 2>&1 || true)"
+
+cat <<MSG
+Hermes update may be available.
+
+Current version:
+$current
+
+Update check output:
+$output
+
+Recommendation: SSH into the server and run the safe Hermes update routine.
+MSG
+EOF
+chmod +x ~/.hermes/scripts/check-hermes-update.sh
+```
+
+Then schedule it for the night:
+
+```bash
+hermes cron create "0 3 * * *" \
+  --name "Hermes update check" \
+  --script check-hermes-update.sh \
+  --no-agent
+```
+
+With `--no-agent`, the script output is the alert. Empty output stays silent. That means you get a message only when the update check returns something other than the normal already-up-to-date result.
+
+If you want the alert delivered to a specific platform or chat, add the appropriate `--deliver` target for your Hermes setup.
+
+## Operating principle
+
+Separate discovery, update, and recovery:
+
+- Discovery: `hermes update --check`
+- Update: `hermes update`
+- Health check: `hermes doctor` and `hermes gateway status`
+- Recovery view: `journalctl -u hermes-gateway.service --since '10 minutes ago' --no-pager`
+
+That separation keeps the update boring. Boring is what you want for an agent that is also your control plane.
+
+## Sources
+
+- [Hermes Agent CLI commands](https://hermes-agent.nousresearch.com/docs/reference/cli-commands)
+- [Hermes Agent cron jobs](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron)
+
+---
+
 # Use Telegram DM Topics to Organize One Hermes Bot
 
 One long bot chat gets noisy fast.
