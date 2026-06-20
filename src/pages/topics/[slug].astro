@@ -33,44 +33,33 @@ const status = getStatusBadge(topic.data.status);
     "author": { "@type": "Person", "name": "Turtleand", "url": "https://turtleand.com" },
     "url": `https://hermes.turtleand.com/topics/${topic.id}`
   })} />
-  <article class="article-shell">
+  <article class="article-shell blog-article">
     <div class="container article-container">
       <a href="/#field-notes" class="back-link no-underline">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Back to field notes
+        Back to notes
       </a>
 
-      <header class="article-hero">
+      <header class="article-hero article-hero--blog">
         <div class="article-hero__meta">
-          <span class="module-badge">{topic.data.module}</span>
+          <span>{topic.data.module}</span>
           <span class={status.class}>{status.label}</span>
         </div>
         <h1>{topic.data.title}</h1>
         <p>{topic.data.summary}</p>
       </header>
 
-      <div class="article-layout">
-        <aside class="article-rail" aria-label="Article context">
-          <p class="eyebrow">Field note</p>
-          <dl>
-            <div>
-              <dt>Surface</dt>
-              <dd>Hermes Lab</dd>
-            </div>
-            <div>
-              <dt>Mode</dt>
-              <dd>Operational note</dd>
-            </div>
-            <div>
-              <dt>Safety rule</dt>
-              <dd>Pattern shared, private details removed.</dd>
-            </div>
-          </dl>
+      <div class="article-layout article-layout--blog">
+        <aside class="article-rail article-rail--note" aria-label="Article context">
+          <p class="eyebrow">note context</p>
+          <p>
+            Written from real Hermes use. Specific private details are removed; the reusable pattern stays.
+          </p>
         </aside>
 
-        <div class="article-card">
+        <div class="article-card article-card--blog">
           <div class="prose max-w-none">
             <Content />
           </div>

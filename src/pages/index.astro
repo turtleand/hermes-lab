@@ -27,10 +27,6 @@ const modules = [
   },
 ];
 
-const publishedCount = topics.length;
-const completeCount = topics.filter(topic => topic.data.status === 'done').length;
-const moduleCount = modules.length;
-
 function getStatusMeta(status: string) {
   switch (status) {
     case 'done': return { label: 'Verified note', icon: '✓', class: 'status-done' };
@@ -38,112 +34,80 @@ function getStatusMeta(status: string) {
     default: return { label: 'Planned', icon: '○', class: 'status-planned' };
   }
 }
+
+function shortModule(module: string) {
+  return module.replace(/^Module \d+:\s*/, '');
+}
 ---
 
 <BaseLayout title="Home">
-  <section class="hero-shell" aria-labelledby="hero-title">
-    <div class="container hero-grid">
+  <section class="hero-shell blog-hero" aria-labelledby="hero-title">
+    <div class="container blog-hero__grid">
       <div class="hero-copy">
-        <p class="eyebrow">Hermes Lab · operational field notes</p>
-        <h1 id="hero-title">Field notes for making Hermes reliable.</h1>
+        <p class="eyebrow">Turtleand Hermes Lab</p>
+        <h1 id="hero-title">A field notebook for living with Hermes.</h1>
         <p class="hero-lede">
-          Practical notes on gateway health, Telegram workflows, voice delivery, skills, scheduling, and the small checks that make an agent feel dependable.
+          These are practical notes from running Hermes as a real assistant: what broke, what helped, what became a habit, and what is safe to share publicly.
         </p>
-        <div class="hero-actions" aria-label="Primary actions">
-          <a class="button-primary" href="#field-notes">Read the notes</a>
-          <a class="button-secondary" href="/llms.txt">Open llms.txt</a>
-        </div>
+        <p class="hero-note">
+          This is a record, not a pitch: small operating details, tested in use, written down before they disappear into habit.
+        </p>
       </div>
 
-      <aside class="ops-panel" aria-label="Hermes Lab operating snapshot">
-        <div class="ops-panel__header">
-          <span class="terminal-dot terminal-dot--green"></span>
-          <span class="terminal-dot terminal-dot--amber"></span>
-          <span class="terminal-dot terminal-dot--blue"></span>
-          <span class="ops-panel__label">public proof check</span>
-        </div>
-        <dl class="ops-stats">
-          <div>
-            <dt>Published notes</dt>
-            <dd>{publishedCount}</dd>
-          </div>
-          <div>
-            <dt>Complete</dt>
-            <dd>{completeCount}</dd>
-          </div>
-          <div>
-            <dt>Modules</dt>
-            <dd>{moduleCount}</dd>
-          </div>
-        </dl>
-        <div class="log-lines" aria-label="Example verification flow">
-          <p><span>$</span> hermes gateway status</p>
-          <p><span>✓</span> verify from outside the chat session</p>
-          <p><span>✓</span> document the reusable lesson</p>
-          <p><span>→</span> publish only the safe pattern</p>
-        </div>
+      <aside class="desk-note" aria-label="Hermes Lab editorial note">
+        <p class="desk-note__kicker">from the desk</p>
+        <p>
+          I use Hermes as a thinking partner, build companion, news filter, and maintenance layer. When a pattern survives real use, it becomes a note here.
+        </p>
+        <p>
+          Private infrastructure stays private. Public lessons stay reusable.
+        </p>
       </aside>
     </div>
   </section>
 
   <section class="field-notes-section" id="field-notes" aria-labelledby="field-notes-title">
-    <div class="container">
-      <div class="section-heading">
-        <p class="eyebrow">Curriculum spine</p>
-        <h2 id="field-notes-title">A small operating library, built from real use.</h2>
+    <div class="container notebook-layout">
+      <div class="section-heading notebook-intro">
+        <p class="eyebrow">Latest notes</p>
+        <h2 id="field-notes-title">A blog of operational lessons.</h2>
         <p>
-          Hermes Lab keeps the useful pattern and leaves private infrastructure out of view. Each note should help another operator reason, verify, or recover faster.
+          Each note starts with a specific Hermes friction point, then compresses the lesson into something another operator can inspect, adapt, or avoid.
         </p>
       </div>
 
-      <div class="module-stack">
+      <div class="post-list" aria-label="Published field notes">
+        {topics.map((topic) => {
+          const status = getStatusMeta(topic.data.status);
+          return (
+            <article class="post-row">
+              <a href={`/topics/${topic.id}`} class="post-row__link no-underline">
+                <div class="post-row__meta">
+                  <span>{shortModule(topic.data.module)}</span>
+                  <span class={status.class}>{status.icon} {status.label}</span>
+                </div>
+                <h3>{topic.data.title}</h3>
+                <p>{topic.data.summary}</p>
+                <span class="post-row__read">Continue reading</span>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+
+      <aside class="thread-index" aria-label="Notebook threads">
+        <p class="thread-index__title">Notebook threads</p>
         {modules.map((module) => (
-          <section class="module-panel" aria-labelledby={`module-${module.id}`}>
-            <div class="module-panel__rail" aria-hidden="true">
-              <span>{module.code}</span>
-            </div>
-            <div class="module-panel__body">
-              <div class="module-panel__header">
-                <div>
-                  <p class="module-kicker">{module.fullTitle}</p>
-                  <h3 id={`module-${module.id}`}>{module.title}</h3>
-                  <p>{module.description}</p>
-                </div>
-                <div class="module-count">
-                  <strong>{module.topics.length}</strong>
-                  <span>{module.topics.length === 1 ? 'note' : 'notes'}</span>
-                </div>
-              </div>
-
-              <p class="module-intent">{module.intent}</p>
-
-              {module.topics.length > 0 ? (
-                <div class="topic-grid">
-                  {module.topics.map((topic) => {
-                    const status = getStatusMeta(topic.data.status);
-                    return (
-                      <a href={`/topics/${topic.id}`} class="topic-card no-underline">
-                        <div class="topic-card__status">
-                          <span class={status.class}>{status.icon}</span>
-                          <span>{status.label}</span>
-                        </div>
-                        <h4>{topic.data.title}</h4>
-                        <p>{topic.data.summary}</p>
-                        <span class="topic-card__cta">Read field note</span>
-                      </a>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div class="empty-panel">
-                  <span>Queued</span>
-                  <p>Foundation notes will appear here once they clear the same verification and public-safety loop.</p>
-                </div>
-              )}
+          <section class="thread-index__item" aria-labelledby={`module-${module.id}`}>
+            <span>{module.code}</span>
+            <div>
+              <h3 id={`module-${module.id}`}>{module.title}</h3>
+              <p>{module.description}</p>
+              <small>{module.topics.length} {module.topics.length === 1 ? 'note' : 'notes'}</small>
             </div>
           </section>
         ))}
-      </div>
+      </aside>
     </div>
   </section>
 </BaseLayout>
