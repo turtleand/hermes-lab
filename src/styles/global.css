@@ -1024,12 +1024,49 @@
     text-transform: uppercase;
   }
 
+  .article-container--blog {
+    width: min(100% - 2rem, 58rem);
+  }
+
+  .article-page {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--panel) 97%, transparent), color-mix(in srgb, var(--panel-soft) 86%, transparent)),
+      var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 1.35rem;
+    box-shadow: var(--shadow-tight);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .article-page::before {
+    background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent-2) 70%, var(--accent)));
+    bottom: 0;
+    content: '';
+    left: 0;
+    opacity: 0.72;
+    position: absolute;
+    top: 0;
+    width: 0.32rem;
+  }
+
   .article-hero--blog {
     background: transparent;
     border: 0;
     box-shadow: none;
-    margin-bottom: 1.25rem;
-    padding: clamp(1rem, 3vw, 2rem) 0 clamp(1.2rem, 4vw, 2.4rem);
+    margin: 0;
+    padding: clamp(1.35rem, 3.8vw, 2.45rem) clamp(1.25rem, 4vw, 2.55rem) clamp(1.1rem, 3vw, 1.75rem);
+    position: relative;
+  }
+
+  .article-hero--blog::after {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 38%, var(--border)), var(--border), transparent);
+    bottom: 0;
+    content: '';
+    height: 1px;
+    left: clamp(1.25rem, 4vw, 2.55rem);
+    position: absolute;
+    right: clamp(1.25rem, 4vw, 2.55rem);
   }
 
   .article-hero--blog .article-hero__meta {
@@ -1044,22 +1081,23 @@
   }
 
   .article-hero--blog h1 {
-    max-width: 15ch;
+    max-width: 13.5ch;
+  }
+
+  .article-hero--blog p {
+    max-width: 40rem;
   }
 
   .article-layout--blog {
-    grid-template-columns: minmax(0, 52rem);
-    justify-content: center;
+    display: block;
   }
 
   .article-card--blog {
-    border-radius: 1rem;
-    padding: clamp(1.1rem, 3vw, 2rem);
-  }
-
-  .article-card--blog {
-    grid-column: 1;
-    grid-row: 1;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: clamp(1.2rem, 3.4vw, 2.35rem) clamp(1.25rem, 4vw, 2.55rem) clamp(1.45rem, 4vw, 2.75rem);
   }
 }
 

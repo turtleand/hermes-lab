@@ -34,7 +34,7 @@ const status = getStatusBadge(topic.data.status);
     "url": `https://hermes.turtleand.com/topics/${topic.id}`
   })} />
   <article class="article-shell blog-article">
-    <div class="container article-container">
+    <div class="container article-container article-container--blog">
       <a href="/#field-notes" class="back-link no-underline">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -42,19 +42,21 @@ const status = getStatusBadge(topic.data.status);
         Back to notes
       </a>
 
-      <header class="article-hero article-hero--blog">
-        <div class="article-hero__meta">
-          <span>{topic.data.module}</span>
-          <span class={status.class}>{status.label}</span>
-        </div>
-        <h1>{topic.data.title}</h1>
-        <p>{topic.data.summary}</p>
-      </header>
+      <div class="article-page">
+        <header class="article-hero article-hero--blog">
+          <div class="article-hero__meta">
+            <span>{topic.data.module}</span>
+            <span class={status.class}>{status.label}</span>
+          </div>
+          <h1>{topic.data.title}</h1>
+          <p>{topic.data.summary}</p>
+        </header>
 
-      <div class="article-layout article-layout--blog">
-        <div class="article-card article-card--blog">
-          <div class="prose max-w-none">
-            <Content />
+        <div class="article-layout article-layout--blog">
+          <div class="article-card article-card--blog">
+            <div class="prose max-w-none">
+              <Content />
+            </div>
           </div>
         </div>
       </div>
