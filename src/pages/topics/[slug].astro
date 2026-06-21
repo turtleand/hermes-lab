@@ -15,7 +15,7 @@ const { Content } = await render(topic);
 
 function getStatusBadge(status: string) {
   switch (status) {
-    case 'done': return { label: 'Verified note', class: 'status-badge status-badge--done' };
+    case 'done': return { label: 'Published', class: 'status-badge status-badge--done' };
     case 'in-progress': return { label: 'In progress', class: 'status-badge status-badge--progress' };
     default: return { label: 'Planned', class: 'status-badge status-badge--planned' };
   }

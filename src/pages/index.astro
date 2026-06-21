@@ -29,7 +29,7 @@ const modules = [
 
 function getStatusMeta(status: string) {
   switch (status) {
-    case 'done': return { label: 'Verified note', icon: '✓', class: 'status-done' };
+    case 'done': return { label: 'Published', icon: '✓', class: 'status-done' };
     case 'in-progress': return { label: 'In progress', icon: '◐', class: 'status-in-progress' };
     default: return { label: 'Planned', icon: '○', class: 'status-planned' };
   }
