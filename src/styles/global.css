@@ -1048,24 +1048,13 @@
   }
 
   .article-layout--blog {
-    grid-template-columns: minmax(0, 44rem) 15rem;
+    grid-template-columns: minmax(0, 52rem);
+    justify-content: center;
   }
 
   .article-card--blog {
     border-radius: 1rem;
     padding: clamp(1.1rem, 3vw, 2rem);
-  }
-
-  .article-rail--note {
-    box-shadow: none;
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .article-rail--note p:not(.eyebrow) {
-    color: var(--muted);
-    line-height: 1.6;
-    margin: 0;
   }
 
   .article-card--blog {
