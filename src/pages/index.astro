@@ -2,116 +2,102 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const topics = await getCollection('topics', ({ data }) => !data.draft);
+const topics = (await getCollection('topics', ({ data }) => !data.draft)).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
 
-// Group topics by module
 const modules = [
   {
     id: 0,
-    title: 'Module 0: Setup & Voice',
-    description: 'Getting Hermes voice and gateway workflows right from the start',
+    code: 'M0',
+    title: 'Setup & Voice',
+    fullTitle: 'Module 0: Setup & Voice',
+    description: 'Gateway, Telegram, voice, and update routines that make Hermes dependable in daily use.',
+    intent: 'Get the operating layer right before scaling the assistant.',
     topics: topics.filter(t => t.data.module === 'Module 0: Setup & Voice'),
-    planned: []
   },
   {
     id: 1,
-    title: 'Module 1: Foundations',
-    description: 'Core patterns for using Hermes as a serious reasoning companion',
+    code: 'M1',
+    title: 'Foundations',
+    fullTitle: 'Module 1: Foundations',
+    description: 'Core patterns for using Hermes as a serious reasoning companion.',
+    intent: 'Turn repeated use into reusable operating principles.',
     topics: topics.filter(t => t.data.module === 'Module 1: Foundations'),
-    planned: []
   },
 ];
 
-function getStatusIcon(status: string) {
-  switch (status) {
-    case 'done': return { icon: '✓', class: 'status-done' };
-    case 'in-progress': return { icon: '◐', class: 'status-in-progress' };
-    default: return { icon: '○', class: 'status-planned' };
-  }
+function shortModule(module: string) {
+  return module.replace(/^Module \d+:\s*/, '');
 }
 ---
 
 <BaseLayout title="Home">
-  <!-- Hero Section -->
-  <section class="py-16 md:py-24">
-    <div class="container text-center">
-      <!-- Signal hero card -->
-      <div class="card max-w-2xl mx-auto mb-8">
-        <div class="module-badge mb-4">
-          <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
-          Field Notes
-        </div>
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">
-          Turtleand <span class="text-accent">Hermes</span>
-        </h1>
-        <p class="text-lg text-muted max-w-xl mx-auto">
-          Practical Hermes Agent field notes: voice workflows, Telegram delivery, tools, skills, scheduling, and operational fixes that make agents feel reliable.
+  <section class="hero-shell blog-hero" aria-labelledby="hero-title">
+    <div class="container blog-hero__grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Turtleand Hermes Lab</p>
+        <h1 id="hero-title">A field notebook for living with Hermes.</h1>
+        <p class="hero-lede">
+          These are practical notes from running Hermes as a real assistant: what broke, what helped, what became a habit, and what is safe to share publicly.
+        </p>
+        <p class="hero-note">
+          This is a record, not a pitch: small operating details, tested in use, written down before they disappear into habit.
         </p>
       </div>
+
+      <aside class="desk-note" aria-label="Hermes Lab editorial note">
+        <p class="desk-note__kicker">from the desk</p>
+        <p>
+          I use Hermes as a thinking partner, build companion, news filter, and maintenance layer. When a pattern survives real use, it becomes a note here.
+        </p>
+        <p>
+          Private infrastructure stays private. Public lessons stay reusable.
+        </p>
+      </aside>
     </div>
   </section>
 
-  <!-- Module Rows -->
-  <section class="pb-16">
-    <div class="container">
-      <div class="space-y-4">
-        {modules.map((module) => (
-          <details class="group card" open={module.id === 0}>
-            <summary class="cursor-pointer list-none flex items-center justify-between">
-              <div>
-                <h2 class="text-xl font-semibold mb-1">{module.title}</h2>
-                <p class="text-sm text-muted">{module.description}</p>
-              </div>
-              <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-
-            <div class="mt-6 space-y-3">
-              {/* Published topics */}
-              {module.topics.map((topic) => {
-                const status = getStatusIcon(topic.data.status);
-                return (
-                  <a
-                    href={`/topics/${topic.id}`}
-                    class="block p-4 rounded-lg border border-border bg-panel-soft hover:border-accent transition-colors no-underline group/item"
-                  >
-                    <div class="flex items-start gap-3">
-                      <span class={`text-lg ${status.class}`}>{status.icon}</span>
-                      <div class="flex-1">
-                        <h3 class="font-medium text-ink group-hover/item:text-accent transition-colors">
-                          {topic.data.title}
-                        </h3>
-                        <p class="text-sm text-muted mt-1">{topic.data.summary}</p>
-                      </div>
-                      <svg class="w-4 h-4 text-muted group-hover/item:text-accent transition-colors mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </a>
-                );
-              })}
-
-              {/* Planned topics */}
-              {module.planned.map((item) => (
-                <div class="p-4 rounded-lg border border-border border-dashed bg-transparent">
-                  <div class="flex items-start gap-3">
-                    <span class="text-lg status-planned">○</span>
-                    <div>
-                      <h3 class="font-medium text-muted">{item.title}</h3>
-                      <p class="text-sm text-muted/70 mt-1">{item.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {module.topics.length === 0 && module.planned.length === 0 && (
-                <p class="text-sm text-muted py-4 text-center">Coming soon</p>
-              )}
-            </div>
-          </details>
-        ))}
+  <section class="field-notes-section" id="field-notes" aria-labelledby="field-notes-title">
+    <div class="container notebook-layout">
+      <div class="section-heading notebook-intro">
+        <p class="eyebrow">Latest notes</p>
+        <h2 id="field-notes-title">A blog of operational lessons.</h2>
+        <p>
+          Each note starts with a specific Hermes friction point, then compresses the lesson into something another operator can inspect, adapt, or avoid.
+        </p>
       </div>
+
+      <div class="post-list" aria-label="Field notes">
+        {topics.map((topic) => {
+          return (
+            <article class="post-row">
+              <a href={`/topics/${topic.id}`} class="post-row__link no-underline">
+                <div class="post-row__meta">
+                  <span>{shortModule(topic.data.module)}</span>
+                </div>
+                <h3>{topic.data.title}</h3>
+                <p>{topic.data.summary}</p>
+                <span class="post-row__read">Continue reading</span>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+
+      <aside class="thread-index" aria-label="Notebook threads">
+        <p class="thread-index__title">Notebook threads</p>
+        {modules.map((module) => (
+          <section class="thread-index__item" aria-labelledby={`module-${module.id}`}>
+            <span>{module.code}</span>
+            <div>
+              <h3 id={`module-${module.id}`}>{module.title}</h3>
+              <p>{module.description}</p>
+              <small>{module.topics.length} {module.topics.length === 1 ? 'note' : 'notes'}</small>
+            </div>
+          </section>
+        ))}
+      </aside>
     </div>
   </section>
 </BaseLayout>
