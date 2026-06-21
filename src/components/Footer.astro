@@ -7,20 +7,16 @@ const links = [
 ];
 ---
 
-<footer class="mt-auto" style="background: var(--footer-bg);">
-  <div class="container py-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted">
-      <p>&copy; {year} Turtleand Hermes</p>
-      <div class="flex items-center gap-3">
-        {links.map(({ href, label }) => (
-          <a
-            href={href}
-            class="px-3 py-1.5 rounded-pill border border-border hover:border-border-strong hover:text-ink no-underline transition-all"
-          >
-            {label}
-          </a>
-        ))}
-      </div>
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <p class="site-footer__title">Turtleand Hermes Lab</p>
+      <p class="site-footer__meta">&copy; {year} Turtleand. Public lessons, private details removed.</p>
+    </div>
+    <div class="site-footer__links">
+      {links.map(({ href, label }) => (
+        <a href={href} class="utility-link no-underline">{label}</a>
+      ))}
     </div>
   </div>
 </footer>
