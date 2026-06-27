@@ -45,6 +45,7 @@ const resolvedOgImage = new URL(ogImage, resolvedCanonicalURL).href;
     <meta name="twitter:image" content={resolvedOgImage} />
     <meta name="theme-color" content="#0f172a" />
 
+    <link rel="alternate" type="application/rss+xml" title="Turtleand Hermes Lab RSS" href="/rss.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{fullTitle}</title>
     <script type="application/ld+json" set:html={JSON.stringify({
