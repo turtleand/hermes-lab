@@ -566,18 +566,48 @@
     margin: 0.45rem 0 0;
   }
 
-  .module-badge {
+  .module-badge,
+  .status-badge {
     align-items: center;
-    background: var(--panel-tint);
-    border: 1px solid var(--border);
     border-radius: 999px;
-    color: var(--muted);
     display: inline-flex;
     font-size: 0.75rem;
     font-weight: 750;
     gap: 0.4rem;
     padding: 0.45rem 0.7rem;
   }
+
+  .module-badge {
+    background: var(--panel-tint);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .status-badge {
+    border: 1px solid transparent;
+  }
+
+  .status-badge--done {
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    color: var(--accent);
+  }
+
+  .status-badge--progress {
+    background: color-mix(in srgb, var(--accent-2) 13%, transparent);
+    border-color: color-mix(in srgb, var(--accent-2) 28%, transparent);
+    color: var(--accent-2);
+  }
+
+  .status-badge--planned {
+    background: color-mix(in srgb, var(--muted) 12%, transparent);
+    border-color: color-mix(in srgb, var(--muted) 24%, transparent);
+    color: var(--muted);
+  }
+
+  .status-done { color: var(--accent); }
+  .status-in-progress { color: var(--accent-2); }
+  .status-planned { color: var(--muted); }
 
   .article-shell {
     padding-block: clamp(2rem, 5vw, 4rem) clamp(4rem, 8vw, 7rem);
@@ -913,6 +943,12 @@
     letter-spacing: 0.08em;
     margin-bottom: 0.75rem;
     text-transform: uppercase;
+  }
+
+  .post-row__meta span + span::before {
+    color: var(--border-strong);
+    content: '/';
+    margin-right: 0.55rem;
   }
 
   .post-row h3 {
