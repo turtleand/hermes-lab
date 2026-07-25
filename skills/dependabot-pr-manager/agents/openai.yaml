@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dependabot PR Manager"
+  short_description: "Safely validate and merge Dependabot PRs"
+  default_prompt: "Use $dependabot-pr-manager to validate and merge the open Dependabot PR queue one at a time."
