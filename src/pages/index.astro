@@ -27,6 +27,14 @@ const modules = [
   },
 ];
 
+function getStatusMeta(status: string) {
+  switch (status) {
+    case 'done': return { label: 'Published', icon: '✓', class: 'status-done' };
+    case 'in-progress': return { label: 'In progress', icon: '◐', class: 'status-in-progress' };
+    default: return { label: 'Planned', icon: '○', class: 'status-planned' };
+  }
+}
+
 function shortModule(module: string) {
   return module.replace(/^Module \d+:\s*/, '');
 }
@@ -68,13 +76,15 @@ function shortModule(module: string) {
         </p>
       </div>
 
-      <div class="post-list" aria-label="Field notes">
+      <div class="post-list" aria-label="Published field notes">
         {topics.map((topic) => {
+          const status = getStatusMeta(topic.data.status);
           return (
             <article class="post-row">
               <a href={`/topics/${topic.id}`} class="post-row__link no-underline">
                 <div class="post-row__meta">
                   <span>{shortModule(topic.data.module)}</span>
+                  <span class={status.class}>{status.icon} {status.label}</span>
                 </div>
                 <h3>{topic.data.title}</h3>
                 <p>{topic.data.summary}</p>
