@@ -13,6 +13,15 @@ export async function getStaticPaths() {
 const { topic } = Astro.props;
 const { Content } = await render(topic);
 
+function getStatusBadge(status: string) {
+  switch (status) {
+    case 'done': return { label: 'Published', class: 'status-badge status-badge--done' };
+    case 'in-progress': return { label: 'In progress', class: 'status-badge status-badge--progress' };
+    default: return { label: 'Planned', class: 'status-badge status-badge--planned' };
+  }
+}
+
+const status = getStatusBadge(topic.data.status);
 ---
 
 <BaseLayout title={topic.data.title} description={topic.data.summary} ogType="article">
@@ -37,6 +46,7 @@ const { Content } = await render(topic);
         <header class="article-hero article-hero--blog">
           <div class="article-hero__meta">
             <span>{topic.data.module}</span>
+            <span class={status.class}>{status.label}</span>
           </div>
           <h1>{topic.data.title}</h1>
           <p>{topic.data.summary}</p>
