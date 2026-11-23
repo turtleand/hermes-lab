@@ -5,18 +5,31 @@ description: Review, repair, validate, and merge GitHub Dependabot PRs one at a 
 
 # Dependabot PR Manager
 
-Safely move a Dependabot queue from oldest open PR to empty. Prove that each prospective merge preserves the repository's build, runtime behavior, routes, interactions, and visual contracts before merging its exact head SHA.
+Safely move a Dependabot queue from oldest open PR to empty. Prove that each prospective merge preserves the repository's build, runtime behavior, routes, interactions, and visual contracts before merging its exact validated base, head, and resulting tree.
 
 ## Operating rules
 
 - Read the target repository's `AGENTS.md`, `CLAUDE.md`, and relevant project guidance first.
-- Preserve the user's active checkout and unrelated work. Use a clean temporary clone or detached worktree.
+- Preserve the user's active checkout and unrelated work. Use a clean temporary clone or detached worktree for source preparation; a worktree alone is not execution isolation.
 - Process one PR at a time. Refresh the default branch after every merge before touching the next PR.
 - Validate the prospective merge result, not only the bot's stale head branch.
 - Treat semver as risk input, not proof of safety. Patch updates can still break a runtime.
 - Keep repairs limited to dependency manifests, lockfiles, and the smallest required compatibility configuration.
 - Never force-push a Dependabot branch after concurrent bot activity. Fetch the new head, compare trees, and validate the exact replacement SHA.
-- Merge only the exact head SHA that passed local checks, GitHub checks, and deploy-preview verification.
+- Bind validation to the target branch identity, actual current base tip SHA, PR head SHA, and prospective merge tree SHA. An unchanged head alone is not sufficient.
+- Merge only when these identities match the evidence from local checks, GitHub checks, and deploy-preview verification. Fail closed on missing evidence or drift.
+
+## Execution boundary
+
+Treat dependency installation, lockfile regeneration, lifecycle scripts, builds, lint, tests, audit tooling, and preview code as untrusted execution, including on the baseline.
+
+- Run these steps only in a disposable, unprivileged execution environment with no maintainer credentials, tokens, SSH agents, cloud credentials, authenticated browser profiles, or access to credential stores.
+- Do not mount the host home directory, credential files, privileged sockets, or unrelated working directories. Use fresh dependency caches and an explicit minimal environment. Restrict network access to what validation needs; do not grant access to internal services.
+- Prepare source separately from execution. Do not carry authenticated Git configuration or credential helpers into the runner. Inspect source and package scripts before execution. Disabling install scripts alone does not make subsequent build or test commands trusted.
+- Use a separate unauthenticated browser profile for previews and smoke tests.
+- Export only reviewed patches and inert evidence. Do not execute generated artifacts or source runner-provided shell instructions in the privileged context.
+- Keep authenticated fetch/push, PR review, merge, and publishing in a separate trusted context that does not run dependency-controlled code. Revalidate identities there using GitHub, not runner-provided claims alone.
+- If adequate isolation is unavailable, stop execution and report the blocker. Do not fall back to installing or testing on the credentialed maintainer host.
 
 ## 1. Inventory the queue
 
@@ -30,8 +43,8 @@ Under standing "merge the safe ones" authority, treat only patch dependency upda
 
 ## 2. Build the prospective merge result
 
-1. Fetch the current default branch and PR head into the isolated checkout.
-2. Merge the current default branch into the PR validation branch.
+1. Resolve the PR's actual target branch and freshly fetch its current remote tip and the PR head. Record immutable base and head SHAs; do not substitute an old merge-base for the current target tip.
+2. Build the prospective merge result from those exact commits in a clean validation checkout. Record the resulting tree SHA and the merge method. Transfer source to the credential-free runner before executing any package tooling.
 3. If conflicts occur, inspect stages with:
 
    ```bash
@@ -47,7 +60,7 @@ Under standing "merge the safe ones" authority, treat only patch dependency upda
 
 ## 3. Establish baseline evidence
 
-Run the same battery on a clean checkout of the current default branch:
+Run the same battery in the credential-free runner on a clean checkout of the recorded current target-branch base SHA:
 
 - Clean locked install under a runtime supported by the repository's dependencies.
 - Type-check or compile step when present.
@@ -65,7 +78,7 @@ Do not call a candidate broken when the same failure exists on the baseline. Rec
 
 Run the identical clean-install and validation battery on the prospective merge result. Do not reuse the baseline's `node_modules`.
 
-For npm repositories, prefer:
+For npm repositories, run the following only inside the credential-free runner after inspecting the scripts:
 
 ```bash
 npm ci --no-audit --no-fund
@@ -121,20 +134,21 @@ When the candidate fails:
 3. Keep paired runtime packages on compatible releases.
 4. Regenerate the lockfile.
 5. Rerun the clean install, build, lint, tests, audit delta, style comparison, browser routes, screenshots, interactions, and console check.
-6. Commit and push only after the repaired result passes.
+6. Review the exported source diff in the trusted publishing context, then commit and push only after the repaired result passes. A new remote head invalidates the old identity record; validate the final remote base/head combination and merge tree before proceeding.
 
 ## 7. Verify GitHub and deploy preview
 
-1. Re-read PR metadata after any push or Dependabot rebase.
-2. Wait for required GitHub checks to finish.
+1. Re-read the actual target branch tip and PR metadata after any push, Dependabot rebase, or target-branch update.
+2. Wait for required GitHub checks to finish and bind their results to the recorded candidate identities, not an earlier head or merge result.
 3. Open the deploy preview and verify representative routes, direct nested-route loading, responsive layout, and browser console state.
 4. Inspect unresolved review threads.
-5. If the remote head changes, fetch it and compare the full tree with the validated result. Never assume equivalence from the commit message.
+5. If the target branch, current base tip, head, or prospective merge tree differs from the validation record, discard the old approval evidence and rebuild and rerun validation. Never assume equivalence from the commit message or an unchanged head.
+6. Confirm the deploy preview corresponds to this same candidate. If its revision cannot be established, report it as unverified.
 
 ## 8. Merge and advance
 
-1. Squash-merge the exact validated head SHA.
-2. Verify the PR reports `merged=true` and record the merge commit.
+1. Immediately before an authorized merge, independently refresh the target branch, base tip, and head and confirm the prospective tree still matches the validation record. Any drift requires rebuilding and rerunning checks, even if the head did not change.
+2. Use only a merge mechanism that enforces validation of the current base/head combination at merge time, such as an already-configured merge queue that tests the final candidate. A head-SHA precondition alone does not guard base movement between the last check and merge. If no such mechanism is available, stop automatic merging and request maintainer review; do not change repository settings or bypass checks. After merging, verify `merged=true`, record the merge commit, and confirm its tree matches the validated result.
 3. Poll post-merge checks on the merge commit when the repository provides them.
 4. Fetch the new default branch.
 5. Rebuild the next PR's prospective merge result from that new baseline.
@@ -152,13 +166,15 @@ Do not merge when any of these remains:
 - Browser console errors, blank fallback rendering, broken media, or overflow.
 - Broken routes, navigation, or critical interactions.
 - Failing required GitHub checks or deploy preview.
-- A head SHA different from the one that passed validation.
+- A different target branch, current base tip, head SHA, or prospective merge tree from the one that passed validation.
+- Missing isolation, uncertain preview/check revision, or no merge-time enforcement of the validated base/head combination.
 
 ## Final evidence
 
 Report:
 
-- PR URLs, validated head SHAs, and merge commits.
+- PR URLs, target branch, validated base/head SHAs, prospective merge tree SHAs, and merge commits.
+- Execution-isolation evidence and the merge-time validation mechanism used.
 - Conflicts and compatibility repairs.
 - Install, build, lint, test, and audit-delta results.
 - Baseline limitations and unchanged warnings.
