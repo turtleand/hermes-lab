@@ -15,7 +15,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@tailwindcss/postcss": "^4.3.3",
     "astro": "^7.3.1",
-    "autoprefixer": "^10.5.4",
+    "autoprefixer": "^10.5.5",
     "postcss": "^8.5.28",
     "satteri": "0.10.5",
     "tailwindcss": "^4.3.2"
